@@ -1,116 +1,126 @@
-import React, { useState } from 'react';
-import { NavScreenId } from '../types';
+import React from 'react';
+import { NavScreenId, UserRole } from '../types';
+import { cn, Icon } from './ui';
 
 interface SidebarProps {
   activeScreen: NavScreenId;
   onSelectScreen: (screen: NavScreenId) => void;
+  currentRole?: UserRole;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeScreen, onSelectScreen }) => {
-  const [logoError, setLogoError] = useState(false);
-  const navItems: { id: NavScreenId; label: string; icon: string }[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'space_dashboard' },
-    { id: 'demand-intelligence', label: 'Demand Intelligence', icon: 'insights' },
-    { id: 'supply-pooling', label: 'Supply Pooling', icon: 'layers' },
-    { id: 'buyer-matching-offers', label: 'Buyer Matching & Offers', icon: 'handshake' },
-    { id: 'net-realization-engine', label: 'Net Realization Engine', icon: 'calculate' },
-    { id: 'logistics-route-optimizer', label: 'Logistics & Routing', icon: 'local_shipping' },
-    { id: 'value-chain-what-if-simulator', label: 'What-If Simulator', icon: 'candlestick_chart' },
-    { id: 'produce-lots', label: 'Produce Lots', icon: 'qr_code_2' },
-    { id: 'ask-kisanflow', label: 'Ask KisanFlow', icon: 'smart_toy' },
-  ];
+interface NavGroup {
+  label: string;
+  items: { id: NavScreenId; label: string; icon: string }[];
+}
 
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: 'Primary',
+    items: [
+      { id: 'dashboard', label: 'Overview', icon: 'space_dashboard' },
+      { id: 'market', label: 'Market', icon: 'storefront' },
+      { id: 'produce-lots', label: 'Inventory', icon: 'inventory_2' },
+      { id: 'buyer-matching-offers', label: 'Orders', icon: 'fact_check' },
+      { id: 'logistics-route-optimizer', label: 'Logistics', icon: 'local_shipping' },
+    ],
+  },
+  {
+    label: 'Intelligence',
+    items: [
+      { id: 'demand-intelligence', label: 'Demand Forecast', icon: 'query_stats' },
+      { id: 'ai-recommendations', label: 'AI Recommendations', icon: 'auto_awesome' },
+      { id: 'net-realization-engine', label: 'Net Realization', icon: 'payments' },
+      { id: 'value-chain-what-if-simulator', label: 'What-If Analysis', icon: 'balance' },
+    ],
+  },
+  {
+    label: 'Network',
+    items: [
+      { id: 'buyers', label: 'Buyers', icon: 'groups' },
+      { id: 'supply-pooling', label: 'FPO Network', icon: 'hub' },
+    ],
+  },
+  {
+    label: 'Analytics',
+    items: [{ id: 'analytics', label: 'Analytics', icon: 'monitoring' }],
+  },
+];
+
+const ROLE_ICON: Record<UserRole, string> = {
+  'FPO / Farmer': 'agriculture',
+  'Bulk Buyer': 'shopping_cart',
+  'Logistics Hub': 'local_shipping',
+  Admin: 'admin_panel_settings',
+};
+
+export const Sidebar: React.FC<SidebarProps> = ({ activeScreen, onSelectScreen, currentRole = 'FPO / Farmer' }) => {
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-surface-container-low z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-outline-variant/20">
-      <div className="flex flex-col h-full">
-        {/* Top Node Branding: Single KisanFlow identity anchor */}
-        <div className="h-14 px-3 flex items-center justify-between bg-surface-container-low border-b border-outline-variant/20">
-          <div className="flex items-center gap-2 cursor-pointer min-w-0" onClick={() => onSelectScreen('dashboard')}>
-            {!logoError ? (
-              <img
-                alt="KisanFlow AI Logo"
-                className="h-8 sm:h-[34px] w-auto max-w-[175px] object-contain flex-shrink-0"
-                src="https://lh3.googleusercontent.com/aida/AEtjO1Xt-94CEVB5oeoc1iVjox7E4epZpW4Ft6RxaNH8H8WYDX-Qv6klbxiRFqpiWstOVMp8Rg_nJaPF3kgGptlpuBarwpOdwecKF3EMk4XKi7SUSNTJnFaignIeNrRRA8SOPcQ8gCV23RDSfzZAmncEbSatRiYrFgC1qdfmcn3VnvLpZozGiklGw-usRxrHCdZmolLj5btxrGsK6ayqYGJaywxWUTKy5JmNQmbgYiMkWFavsza5k87RhKxacGc"
-                onError={() => setLogoError(true)}
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-on-primary shadow-xs">
-                  <span className="material-symbols-outlined text-[18px]">hub</span>
-                </div>
-                <div>
-                  <span className="text-base text-primary leading-tight block font-bold tracking-tight">
-                    KisanFlow
-                  </span>
-                  <span className="text-[10px] text-on-surface-variant font-medium tracking-wide uppercase">
-                    GovTech Node
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-          <span className="px-1.5 py-0.5 rounded bg-secondary-container text-on-secondary-container font-mono text-[10px] font-bold flex-shrink-0">
-            GJ-W01
+    <aside className="fixed left-0 top-0 bottom-0 z-40 flex w-[232px] flex-col border-r border-line bg-surface">
+      {/* Brand */}
+      <button
+        onClick={() => onSelectScreen('dashboard')}
+        className="flex h-14 items-center gap-2.5 px-5 text-left border-b border-line flex-shrink-0 hover:bg-subtle transition-colors"
+        type="button"
+      >
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary">
+          <Icon name="hub" size={18} />
+        </span>
+        <span className="leading-tight">
+          <span className="block text-[15px] font-bold tracking-tight text-ink">
+            KisanFlow <span className="text-primary">AI</span>
           </span>
-        </div>
+          <span className="block text-[10px] font-medium uppercase tracking-wide text-faint">
+            From Demand to Delivery
+          </span>
+        </span>
+      </button>
 
-        {/* Operational Node Details Card */}
-        <div className="px-3 py-2">
-          <div className="bg-surface-container-lowest p-2 rounded-md shadow-xs border border-outline-variant/30">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-on-surface-variant uppercase font-semibold tracking-wider">
-                Operational Node
-              </span>
-              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label}>
+            <p className="kf-nav-group-label mb-1.5">{group.label}</p>
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const active = activeScreen === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onSelectScreen(item.id)}
+                    className={cn('kf-nav-item', active && 'kf-nav-item-active')}
+                  >
+                    <Icon name={item.icon} size={17} className="shrink-0" />
+                    <span className="flex-1 truncate">{item.label}</span>
+                    {active && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                  </button>
+                );
+              })}
             </div>
-            <p className="text-[12px] text-on-surface mt-0.5 font-bold truncate">
-              Anand Agri Cluster
-            </p>
-            <p className="text-[10px] text-on-surface-variant">
-              Reg: GJ-FPO-4482
-            </p>
           </div>
-        </div>
+        ))}
+      </nav>
 
-        {/* Main Navigation Links */}
-        <nav className="flex-1 px-2 py-1 overflow-y-auto space-y-0.5">
-          {navItems.map((item) => {
-            const isActive = activeScreen === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onSelectScreen(item.id)}
-                type="button"
-                className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md transition-colors text-left ${
-                  isActive
-                    ? 'bg-primary-container text-on-primary font-semibold shadow-xs'
-                    : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-medium'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[17px]">{item.icon}</span>
-                <span className="text-[12.5px] flex-1 truncate">{item.label}</span>
-                {item.id === 'supply-pooling' && (
-                  <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full ${
-                    isActive ? 'bg-primary text-on-primary' : 'bg-primary-fixed text-on-primary-fixed'
-                  }`}>
-                    2 Active
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+      {/* Bottom */}
+      <div className="border-t border-line px-3 py-3 space-y-1.5 flex-shrink-0 bg-subtle/60">
+        <button
+          type="button"
+          onClick={() => onSelectScreen('ask-kisanflow')}
+          className={cn('kf-nav-item', activeScreen === 'ask-kisanflow' && 'kf-nav-item-active')}
+        >
+          <Icon name="smart_toy" size={17} className="shrink-0" />
+          <span className="flex-1 truncate">Ask KisanFlow</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-good kf-live-dot" />
+        </button>
 
-        {/* Bottom GovTech Prototype Stamp */}
-        <div className="p-2 bg-surface-container-lowest mx-2 mb-2 rounded-md shadow-xs border border-outline-variant/30">
-          <div className="flex items-center gap-1.5 text-primary text-[11px] font-bold">
-            <span className="material-symbols-outlined text-[14px]">verified</span>
-            <span>National Agri-Grid</span>
+        <div className="flex items-center gap-2.5 rounded-lg border border-line bg-surface px-3 py-2.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
+            <Icon name={ROLE_ICON[currentRole]} size={16} />
+          </span>
+          <div className="min-w-0 leading-tight">
+            <p className="truncate text-[12.5px] font-semibold text-ink">Anand Krishak FPO</p>
+            <p className="truncate text-[11px] text-muted">{currentRole}</p>
           </div>
-          <p className="text-on-surface-variant mt-0.5 leading-snug text-[10px]">
-            Govt of India AgriTech Research &amp; Decision Engine
-          </p>
         </div>
       </div>
     </aside>

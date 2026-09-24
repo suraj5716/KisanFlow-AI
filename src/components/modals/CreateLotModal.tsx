@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ProduceLot } from '../../types';
+import { Icon, Button } from '../ui';
 
 interface CreateLotModalProps {
   isOpen: boolean;
@@ -47,35 +48,34 @@ export const CreateLotModal: React.FC<CreateLotModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-inverse-surface/60 backdrop-blur-sm">
-      <div className="w-full max-w-lg bg-surface-container-lowest rounded-lg shadow-2xl overflow-hidden border border-outline-variant/30">
-        <div className="p-3 bg-surface-container-low flex items-center justify-between border-b border-outline-variant/20">
-          <div className="flex items-center gap-2">
-            <span className="p-1 rounded-md bg-primary text-on-primary">
-              <span className="material-symbols-outlined text-[16px]">add_circle</span>
+    <div className="kf-overlay">
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-line bg-surface shadow-pop">
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-soft text-primary">
+              <Icon name="add_circle" size={17} />
             </span>
-            <h3 className="font-bold text-on-surface text-[14px]">
-              Register Digital Produce Lot
-            </h3>
+            <div>
+              <h3 className="text-[15px] font-semibold text-ink">Register Digital Produce Lot</h3>
+              <p className="kf-helper">Seal a harvest batch into the quality registry</p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-on-surface-variant hover:bg-surface-container"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-muted hover:bg-subtle hover:text-ink"
             type="button"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <Icon name="close" size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-3.5 space-y-2.5 text-[12px]">
+        <form onSubmit={handleSubmit} className="space-y-4 p-5">
           <div>
-            <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
-              Crop Variety
-            </label>
+            <label className="kf-label">Crop Variety</label>
             <select
               value={cropVariety}
               onChange={(e) => setCropVariety(e.target.value)}
-              className="w-full p-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md border border-outline-variant/30 focus:outline-none focus:border-primary"
+              className="kf-select mt-1.5"
             >
               <option>Tomato - Himsona (Grade A)</option>
               <option>Potato - Kufri Pukhraj</option>
@@ -85,11 +85,9 @@ export const CreateLotModal: React.FC<CreateLotModalProps> = ({
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-space-sm">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
-                Harvest Quantity (MT)
-              </label>
+              <label className="kf-label">Harvest Quantity (MT)</label>
               <input
                 type="number"
                 step="0.1"
@@ -97,56 +95,45 @@ export const CreateLotModal: React.FC<CreateLotModalProps> = ({
                 max="50"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="w-full p-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md border border-outline-variant/30 focus:outline-none focus:border-primary"
+                className="kf-input mt-1.5"
                 required
               />
             </div>
             <div>
-              <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
-                Harvest Timestamp
-              </label>
+              <label className="kf-label">Harvest Timestamp</label>
               <input
                 type="datetime-local"
                 value={harvestTime}
                 onChange={(e) => setHarvestTime(e.target.value)}
-                className="w-full p-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md border border-outline-variant/30 focus:outline-none focus:border-primary"
+                className="kf-input mt-1.5"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
-              FPO Hub Location
-            </label>
+            <label className="kf-label">FPO Hub Location</label>
             <input
               type="text"
               value={hubLocation}
               onChange={(e) => setHubLocation(e.target.value)}
-              className="w-full p-2.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md border border-outline-variant/30 focus:outline-none focus:border-primary"
+              className="kf-input mt-1.5"
               required
             />
           </div>
 
-          <div className="p-3 bg-surface-container-low rounded-lg text-[12px] text-on-surface-variant flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-[18px]">verified</span>
-            <span>Minting will automatically assign an encrypted IoT QR code &amp; shelf-life decay curve.</span>
+          <div className="flex items-start gap-2 rounded-lg border border-line bg-subtle px-3.5 py-2.5">
+            <Icon name="verified" size={17} className="mt-0.5 shrink-0 text-primary" />
+            <p className="kf-helper">Minting will automatically assign an encrypted IoT QR code &amp; shelf-life decay curve.</p>
           </div>
 
-          <div className="pt-space-sm flex items-center justify-end gap-space-xs border-t border-outline-variant/20">
-            <button
-              onClick={onClose}
-              type="button"
-              className="px-space-md py-2 rounded-lg bg-surface-container-high text-on-surface font-label-lg text-label-lg hover:bg-surface-container font-semibold"
-            >
+          <div className="flex items-center justify-end gap-2 border-t border-line pt-4">
+            <Button variant="ghost" onClick={onClose} type="button">
               Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-space-md py-2 rounded-lg bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary-container font-semibold shadow-xs"
-            >
+            </Button>
+            <Button type="submit" icon="check_circle">
               Mint Digital Lot
-            </button>
+            </Button>
           </div>
         </form>
       </div>

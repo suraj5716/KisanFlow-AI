@@ -7,7 +7,11 @@ export type NavScreenId =
   | 'logistics-route-optimizer'
   | 'value-chain-what-if-simulator'
   | 'produce-lots'
-  | 'ask-kisanflow';
+  | 'ask-kisanflow'
+  | 'market'
+  | 'buyers'
+  | 'ai-recommendations'
+  | 'analytics';
 
 export type UserRole = 'FPO / Farmer' | 'Bulk Buyer' | 'Logistics Hub' | 'Admin';
 

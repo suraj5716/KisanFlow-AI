@@ -1,5 +1,6 @@
 import React from 'react';
 import { NotificationItem } from '../../types';
+import { Icon, Badge, cn } from '../ui';
 
 interface NotificationsDrawerProps {
   isOpen: boolean;
@@ -16,91 +17,81 @@ export const NotificationsDrawer: React.FC<NotificationsDrawerProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const toneFor = (type: string): { badge: 'bad' | 'good' | 'neutral'; icon: string } => {
+    if (type === 'critical') return { badge: 'bad', icon: 'notification_important' };
+    if (type === 'success') return { badge: 'good', icon: 'check_circle' };
+    return { badge: 'neutral', icon: 'info' };
+  };
+
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-inverse-surface/40 backdrop-blur-xs flex justify-end">
-      <div className="w-full max-w-md bg-surface-container-lowest h-full shadow-2xl flex flex-col border-l border-outline-variant/30 animate-in slide-in-from-right duration-200">
-        <div className="p-3 bg-surface-container-low flex items-center justify-between border-b border-outline-variant/20">
-          <div className="flex items-center gap-2">
-            <span className="p-1 rounded-md bg-surface-container text-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-[17px]">notifications_active</span>
+    <div className="kf-overlay flex justify-end">
+      <div className="kf-drawer-in flex h-full w-full max-w-md flex-col border-l border-line bg-surface shadow-drawer">
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-soft text-primary">
+              <Icon name="notifications_active" size={17} />
             </span>
             <div>
-              <h3 className="font-bold text-on-surface text-[13px]">Freshness &amp; IoT Alerts</h3>
-              <p className="text-on-surface-variant text-[10.5px]">
-                Real-time telemetry from Anand &amp; Kheda cold hubs
-              </p>
+              <h3 className="text-[14px] font-semibold text-ink">Freshness &amp; IoT Alerts</h3>
+              <p className="kf-helper">Real-time telemetry from Anand &amp; Kheda cold hubs</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-muted hover:bg-subtle hover:text-ink"
             type="button"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <Icon name="close" size={18} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-space-md space-y-3">
-          {notifications.map((n) => (
-            <div
-              key={n.id}
-              className={`p-3 rounded-lg border transition-all ${
-                n.type === 'critical'
-                  ? 'bg-error-container/20 border-error/30'
-                  : n.type === 'success'
-                  ? 'bg-primary-fixed/20 border-primary/30'
-                  : 'bg-surface-container-low border-outline-variant/30'
-              }`}
-            >
-              <div className="flex items-start gap-2">
-                <span
-                  className={`material-symbols-outlined text-[20px] flex-shrink-0 mt-0.5 ${
-                    n.type === 'critical'
-                      ? 'text-error'
-                      : n.type === 'success'
-                      ? 'text-primary'
-                      : 'text-secondary'
-                  }`}
-                >
-                  {n.type === 'critical'
-                    ? 'notification_important'
+        <div className="flex-1 space-y-3 overflow-y-auto p-4">
+          {notifications.map((n) => {
+            const t = toneFor(n.type);
+            return (
+              <div
+                key={n.id}
+                className={cn(
+                  'rounded-xl border p-3.5',
+                  n.type === 'critical'
+                    ? 'border-bad/30 bg-bad-bg'
                     : n.type === 'success'
-                    ? 'check_circle'
-                    : 'info'}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-label-lg text-label-lg font-bold text-on-surface truncate text-[13px]">
-                      {n.title}
-                    </h4>
-                    <span className="font-label-md text-label-md text-on-surface-variant text-[11px] flex-shrink-0">
-                      {n.timeAgo}
-                    </span>
+                      ? 'border-good/30 bg-good-bg'
+                      : 'border-line bg-subtle',
+                )}
+              >
+                <div className="flex items-start gap-2.5">
+                  <Icon name={t.icon} size={18} className={cn('mt-0.5 shrink-0', n.type === 'critical' ? 'text-bad' : n.type === 'success' ? 'text-good' : 'text-primary')} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="truncate text-[13px] font-semibold text-ink">{n.title}</h4>
+                      <span className="shrink-0 text-[11px] text-faint">{n.timeAgo}</span>
+                    </div>
+                    <p className="mt-1 text-[12px] leading-snug text-muted">{n.description}</p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <Badge tone={t.badge}>{n.type === 'critical' ? 'Action required' : n.type === 'success' ? 'Resolved' : 'Info'}</Badge>
+                      {n.actionable && onActionNotification && (
+                        <button
+                          onClick={() => onActionNotification(n.id)}
+                          className="flex items-center gap-1 text-[11.5px] font-bold text-primary hover:underline"
+                          type="button"
+                        >
+                          Acknowledge &amp; Dispatch Fleet <Icon name="arrow_forward" size={13} />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant text-[12px] mt-1 leading-snug">
-                    {n.description}
-                  </p>
-                  {n.actionable && onActionNotification && (
-                    <button
-                      onClick={() => onActionNotification(n.id)}
-                      className="mt-2 text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
-                      type="button"
-                    >
-                      <span>Acknowledge &amp; Dispatch Fleet</span>
-                      <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-                    </button>
-                  )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div className="p-space-md bg-surface-container-low border-t border-outline-variant/20 flex items-center justify-between text-[12px]">
-          <span className="text-on-surface-variant font-medium">18 Active IoT probes reporting</span>
+        <div className="flex items-center justify-between border-t border-line bg-subtle px-5 py-3.5">
+          <span className="kf-helper">18 Active IoT probes reporting</span>
           <button
             onClick={onClose}
-            className="px-3 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high font-semibold text-[12px]"
+            className="rounded-lg px-3 py-1.5 text-[12px] font-semibold text-ink hover:bg-surface"
             type="button"
           >
             Close Feed

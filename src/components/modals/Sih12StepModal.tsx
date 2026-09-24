@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Icon, Badge, Button, cn } from '../ui';
 
 interface Sih12StepModalProps {
   isOpen: boolean;
@@ -29,6 +30,8 @@ export const Sih12StepModal: React.FC<Sih12StepModalProps> = ({
     { num: 12, stage: 3, title: 'Instant DBT to 1,420 Farmers', detail: 'Direct Benefit Transfer remittance split within 4 hours' },
   ];
 
+  const stageLabels = ['STAGE 1: INGESTION', 'STAGE 2: AI OPTIMIZATION', 'STAGE 3: EXECUTION'];
+
   const handleStartSimulation = () => {
     setIsRunning(true);
     setCurrentStep(1);
@@ -51,214 +54,114 @@ export const Sih12StepModal: React.FC<Sih12StepModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-inverse-surface/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl bg-surface-container-lowest rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-outline-variant/30">
-        {/* Modal Header */}
-        <div className="p-3 bg-surface-container-low flex items-center justify-between border-b border-outline-variant/20">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-primary text-on-primary flex items-center justify-center shadow-xs">
-              <span className="material-symbols-outlined text-[16px]">flag</span>
-            </div>
+    <div className="kf-overlay">
+      <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-pop">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary">
+              <Icon name="flag" size={16} />
+            </span>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-on-surface text-[13.5px]">
-                  National Agri-Grid: 12-Step Autonomous Flow
-                </h3>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary-fixed text-primary">
-                  {currentStep === 12 ? 'Pipeline Complete' : `Running Step ${currentStep}/12...`}
-                </span>
+                <h3 className="text-[14px] font-semibold text-ink">National Agri-Grid: 12-Step Autonomous Flow</h3>
+                <Badge tone={currentStep === 12 ? 'good' : 'primary'}>
+                  {currentStep === 12 ? 'Pipeline complete' : `Running step ${currentStep}/12…`}
+                </Badge>
               </div>
-              <p className="text-on-surface-variant text-[11px]">
-                Simulated Decision Pipeline (Anand FPO → Virtual Pooling → Institutional Settlement)
-              </p>
+              <p className="kf-helper mt-0.5">Anand FPO → Virtual Pooling → Institutional Settlement</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleStartSimulation}
-              disabled={isRunning}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary-container text-on-primary text-[11px] font-bold hover:bg-primary transition-all disabled:opacity-50"
-              type="button"
-            >
-              <span className={`material-symbols-outlined text-[14px] ${isRunning ? 'animate-spin' : ''}`}>
-                {isRunning ? 'sync' : 'replay'}
-              </span>
-              <span>{isRunning ? 'Simulating...' : 'Re-Run Pipeline'}</span>
-            </button>
+            <Button variant="secondary" size="sm" icon="replay" onClick={handleStartSimulation} disabled={isRunning}>
+              {isRunning ? 'Simulating…' : 'Re-run pipeline'}
+            </Button>
             <button
               onClick={onClose}
-              className="p-1 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-muted hover:bg-subtle hover:text-ink"
               type="button"
             >
-              <span className="material-symbols-outlined text-[18px]">close</span>
+              <Icon name="close" size={18} />
             </button>
           </div>
         </div>
 
-        {/* Modal Content: 12-Step Stepper Body */}
-        <div className="p-space-lg overflow-y-auto space-y-space-md flex-1">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-space-sm">
-            {/* Step Block 1: Ingestion */}
-            <div className="p-space-sm rounded-lg bg-surface-container-low border border-outline-variant/30 flex flex-col justify-between">
-              <div>
+        {/* Steps */}
+        <div className="flex-1 space-y-4 overflow-y-auto p-5">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {[0, 1, 2].map((stage) => (
+              <div key={stage} className="flex flex-col rounded-lg border border-line bg-subtle p-3.5">
                 <div className="flex items-center justify-between">
-                  <span className="font-label-md text-label-md text-primary font-bold text-[11px] uppercase tracking-wider">
-                    STAGE 1: INGESTION
-                  </span>
-                  <span className="text-[10px] text-on-surface-variant font-mono">STEPS 1 - 4</span>
+                  <span className="text-[10.5px] font-bold uppercase tracking-wider text-primary">{stageLabels[stage]}</span>
+                  <span className="font-mono text-[10px] text-faint">STEPS {stage * 4 + 1} - {stage * 4 + 4}</span>
                 </div>
-                <ul className="mt-2 space-y-2 font-body-sm text-body-sm text-on-surface">
-                  {steps.slice(0, 4).map((s) => {
+                <ul className="mt-2.5 space-y-2">
+                  {steps.slice(stage * 4, stage * 4 + 4).map((s) => {
                     const isDone = currentStep >= s.num;
                     const isCurrent = currentStep === s.num;
                     return (
                       <li
                         key={s.num}
-                        className={`flex items-start gap-1.5 p-1.5 rounded transition-all ${
+                        className={cn(
+                          'flex items-start gap-1.5 rounded-md p-1.5 transition-all',
                           isCurrent
-                            ? 'bg-primary/10 border border-primary/40 font-bold text-primary'
+                            ? 'border border-primary/40 bg-primary-soft text-primary-strong'
                             : isDone
-                            ? 'text-primary font-medium'
-                            : 'text-on-surface-variant opacity-60'
-                        }`}
+                              ? 'text-primary'
+                              : 'text-faint opacity-70',
+                        )}
                       >
-                        <span className="material-symbols-outlined text-[16px] mt-0.5 flex-shrink-0">
-                          {isDone ? 'check_circle' : 'radio_button_unchecked'}
-                        </span>
-                        <div className="text-[12px] leading-tight">
-                          <span>{s.num}. {s.title}</span>
-                          {isCurrent && <span className="block text-[10px] text-on-surface-variant mt-0.5">{s.detail}</span>}
+                        <Icon name={isDone ? 'check_circle' : 'radio_button_unchecked'} size={15} className="mt-0.5 shrink-0" />
+                        <div className="text-[11.5px] leading-tight">
+                          <span className={cn('font-medium', isDone && !isCurrent ? 'text-ink' : '')}>
+                            {s.num}. {s.title}
+                          </span>
+                          {isCurrent && <span className="mt-0.5 block text-[10px] text-muted">{s.detail}</span>}
                         </div>
                       </li>
                     );
                   })}
                 </ul>
               </div>
-            </div>
-
-            {/* Step Block 2: AI Optimization */}
-            <div className="p-space-sm rounded-lg bg-surface-container-low border border-outline-variant/30 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="font-label-md text-label-md text-primary font-bold text-[11px] uppercase tracking-wider">
-                    STAGE 2: AI OPTIMIZATION
-                  </span>
-                  <span className="text-[10px] text-on-surface-variant font-mono">STEPS 5 - 8</span>
-                </div>
-                <ul className="mt-2 space-y-2 font-body-sm text-body-sm text-on-surface">
-                  {steps.slice(4, 8).map((s) => {
-                    const isDone = currentStep >= s.num;
-                    const isCurrent = currentStep === s.num;
-                    return (
-                      <li
-                        key={s.num}
-                        className={`flex items-start gap-1.5 p-1.5 rounded transition-all ${
-                          isCurrent
-                            ? 'bg-primary/10 border border-primary/40 font-bold text-primary'
-                            : isDone
-                            ? 'text-primary font-medium'
-                            : 'text-on-surface-variant opacity-60'
-                        }`}
-                      >
-                        <span className="material-symbols-outlined text-[16px] mt-0.5 flex-shrink-0">
-                          {isDone ? 'check_circle' : 'radio_button_unchecked'}
-                        </span>
-                        <div className="text-[12px] leading-tight">
-                          <span>{s.num}. {s.title}</span>
-                          {isCurrent && <span className="block text-[10px] text-on-surface-variant mt-0.5">{s.detail}</span>}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            </div>
-
-            {/* Step Block 3: Execution */}
-            <div className="p-space-sm rounded-lg bg-surface-container-low border border-outline-variant/30 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="font-label-md text-label-md text-primary font-bold text-[11px] uppercase tracking-wider">
-                    STAGE 3: EXECUTION
-                  </span>
-                  <span className="text-[10px] text-on-surface-variant font-mono">STEPS 9 - 12</span>
-                </div>
-                <ul className="mt-2 space-y-2 font-body-sm text-body-sm text-on-surface">
-                  {steps.slice(8, 12).map((s) => {
-                    const isDone = currentStep >= s.num;
-                    const isCurrent = currentStep === s.num;
-                    return (
-                      <li
-                        key={s.num}
-                        className={`flex items-start gap-1.5 p-1.5 rounded transition-all ${
-                          isCurrent
-                            ? 'bg-primary/10 border border-primary/40 font-bold text-primary'
-                            : isDone
-                            ? 'text-primary font-medium'
-                            : 'text-on-surface-variant opacity-60'
-                        }`}
-                      >
-                        <span className="material-symbols-outlined text-[16px] mt-0.5 flex-shrink-0">
-                          {isDone ? 'check_circle' : 'radio_button_unchecked'}
-                        </span>
-                        <div className="text-[12px] leading-tight">
-                          <span>{s.num}. {s.title}</span>
-                          {isCurrent && <span className="block text-[10px] text-on-surface-variant mt-0.5">{s.detail}</span>}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Simulation Log Terminal Box */}
-          <div className="bg-inverse-surface rounded-xl p-space-md font-mono text-label-md text-on-primary overflow-x-auto shadow-inner border border-outline-variant/20">
-            <div className="flex items-center justify-between text-on-secondary-fixed-variant pb-2 border-b border-outline-variant/20 text-[11px]">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-primary-fixed animate-ping"></span>
-                <span>TERMINAL LOG: AGRIFLOW_ORCHESTRATOR_RUN</span>
+          {/* Terminal */}
+          <div className="overflow-x-auto rounded-xl border border-line bg-navy p-4 font-mono shadow-inner">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2 text-[11px]">
+              <span className="flex items-center gap-1.5 text-white/70">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 kf-live-dot"></span>
+                TERMINAL LOG: AGRIFLOW_ORCHESTRATOR_RUN
               </span>
-              <span className="text-primary-fixed-dim font-bold">COMPLETED IN 142ms</span>
+              <span className="font-bold text-emerald-300">COMPLETED IN 142ms</span>
             </div>
-            <div className="space-y-1.5 text-on-tertiary-container mt-2 text-[12px]">
+            <div className="mt-2 space-y-1.5 text-[12px] text-white/70">
               <p>
-                <span className="text-primary-fixed">[12:44:01]</span>{' '}
-                <span className="text-inverse-on-surface">INGEST:</span> Loaded 8,400 kg Solanum lycopersicum (Himsona) from Anand Geo-fence.
+                <span className="text-emerald-300">[12:44:01]</span> INGEST: Loaded 8,400 kg Solanum lycopersicum (Himsona) from Anand Geo-fence.
               </p>
               <p>
-                <span className="text-primary-fixed">[12:44:02]</span>{' '}
-                <span className="text-inverse-on-surface">SOLVE:</span> Prophet model identifies Ahmedabad city demand index = 1.18 (+18%).
+                <span className="text-emerald-300">[12:44:02]</span> SOLVE: Prophet model identifies Ahmedabad city demand index = 1.18 (+18%).
               </p>
               <p>
-                <span className="text-primary-fixed">[12:44:02]</span>{' '}
-                <span className="text-inverse-on-surface">CONSTRAIN:</span> Shelf life degradation penalizes transit &gt; 4.2h. Ahmedabad distance = 68km (1.8h safe).
+                <span className="text-emerald-300">[12:44:02]</span> CONSTRAIN: Shelf life degradation penalizes transit &gt; 4.2h. Ahmedabad distance = 68km (1.8h safe).
               </p>
               <p>
-                <span className="text-primary-fixed">[12:44:03]</span>{' '}
-                <span className="text-inverse-on-surface">OPTIMIZE:</span> Joined with Kheda FPO (4T) + Anand B (3T) = 12T batch. Unlocks Tier-1 pricing @ ₹30.20/kg.
+                <span className="text-emerald-300">[12:44:03]</span> OPTIMIZE: Joined with Kheda FPO (4T) + Anand B (3T) = 12T batch. Unlocks Tier-1 pricing @ ₹30.20/kg.
               </p>
-              <p className="text-primary-fixed-dim font-bold bg-primary-container/20 p-1.5 rounded">
+              <p className="rounded bg-emerald-400/15 p-1.5 font-bold text-emerald-200">
                 [12:44:03] ARBITRAGE WON: +₹10.85/kg over APMC benchmark. Escrow #ESC-AHM-902 initiated.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Modal Footer */}
-        <div className="p-space-md bg-surface-container-low flex items-center justify-between border-t border-outline-variant/20">
-          <span className="font-body-sm text-body-sm text-on-surface-variant text-[12px] flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[16px] text-primary">verified</span>
-            <span>Validated against MoCA &amp; Food &amp; Public Distribution guidelines</span>
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t border-line bg-subtle px-5 py-3.5">
+          <span className="flex items-center gap-1.5 text-[12px] text-muted">
+            <Icon name="verified" size={15} className="text-primary" />
+            Validated against MoCA &amp; Food &amp; Public Distribution guidelines
           </span>
-          <button
-            onClick={onClose}
-            className="px-space-md py-2 rounded-lg bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary-container font-semibold transition-all shadow-xs"
-            type="button"
-          >
-            Close Flow Visualizer
-          </button>
+          <Button onClick={onClose}>Close Flow Visualizer</Button>
         </div>
       </div>
     </div>

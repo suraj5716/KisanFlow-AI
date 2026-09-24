@@ -2,19 +2,25 @@ import React, { useState } from 'react';
 import { NavScreenId, UserRole, ProduceLot, NotificationItem } from './types';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
-import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
 import { NotificationsDrawer } from './components/modals/NotificationsDrawer';
 import { Sih12StepModal } from './components/modals/Sih12StepModal';
 import { CreateLotModal } from './components/modals/CreateLotModal';
 import { DashboardScreen } from './components/screens/DashboardScreen';
+import { BuyerDashboard } from './components/screens/BuyerDashboard';
+import { LogisticsDashboard } from './components/screens/LogisticsDashboard';
+import { AdminDashboard } from './components/screens/AdminDashboard';
+import { MarketScreen } from './components/screens/MarketScreen';
 import { DemandIntelligenceScreen } from './components/screens/DemandIntelligenceScreen';
+import { AIRecommendationsScreen } from './components/screens/AIRecommendationsScreen';
 import { SupplyPoolingScreen } from './components/screens/SupplyPoolingScreen';
 import { BuyerMatchingScreen } from './components/screens/BuyerMatchingScreen';
+import { BuyersScreen } from './components/screens/BuyersScreen';
 import { NetRealizationScreen } from './components/screens/NetRealizationScreen';
 import { LogisticsScreen } from './components/screens/LogisticsScreen';
 import { WhatIfSimulatorScreen } from './components/screens/WhatIfSimulatorScreen';
 import { ProduceLotsScreen } from './components/screens/ProduceLotsScreen';
+import { AnalyticsScreen } from './components/screens/AnalyticsScreen';
 import { AskKisanFlowScreen } from './components/screens/AskKisanFlowScreen';
 
 export default function App() {
@@ -109,84 +115,89 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background font-body-md text-on-surface antialiased flex flex-col">
+    <div className="min-h-screen bg-page font-sans text-ink antialiased">
       {/* Sidebar Navigation */}
-      <Sidebar activeScreen={activeScreen} onSelectScreen={setActiveScreen} />
+      <Sidebar activeScreen={activeScreen} onSelectScreen={setActiveScreen} currentRole={currentRole} />
 
       {/* Main Content Area */}
-      <div className="pl-64 flex-1 flex flex-col">
+      <div className="flex min-h-screen flex-col pl-[232px]">
         {/* Top Header */}
         <Header
+          activeScreen={activeScreen}
           currentRole={currentRole}
           onSelectRole={(role) => {
             setCurrentRole(role);
             showToast(`Switched active portal view to: ${role}`);
           }}
-          onRunHackathonDemo={handleRunHackathonDemo}
           onToggleNotifications={() => setIsNotificationsDrawerOpen((prev) => !prev)}
           unreadCount={notifications.length}
-          activeScreen={activeScreen}
+          onNavigate={setActiveScreen}
         />
 
         {/* Viewport Content */}
-        <main className="relative pt-14 w-full px-4 sm:px-6 min-h-screen bg-background pb-12">
-          {activeScreen === 'dashboard' && (
-            <DashboardScreen
-              onNavigate={setActiveScreen}
-              onOpenSihModal={() => setIsSihModalOpen(true)}
-              onOpenCreateLotModal={() => setIsCreateLotModalOpen(true)}
-              onShowToast={showToast}
-              lots={lots}
-            />
-          )}
+        <main className="relative min-h-screen w-full bg-page px-6 pb-14 pt-14">
+          <div className="mx-auto w-full max-w-[1320px]">
+            {activeScreen === 'dashboard' && currentRole === 'FPO / Farmer' && (
+              <DashboardScreen
+                onNavigate={setActiveScreen}
+                onOpenSihModal={() => setIsSihModalOpen(true)}
+                onOpenCreateLotModal={() => setIsCreateLotModalOpen(true)}
+                onShowToast={showToast}
+                lots={lots}
+              />
+            )}
 
-          {activeScreen === 'demand-intelligence' && (
-            <DemandIntelligenceScreen
-              onNavigate={setActiveScreen}
-              onShowToast={showToast}
-            />
-          )}
+            {activeScreen === 'dashboard' && currentRole === 'Bulk Buyer' && (
+              <BuyerDashboard onNavigate={setActiveScreen} onShowToast={showToast} />
+            )}
 
-          {activeScreen === 'supply-pooling' && (
-            <SupplyPoolingScreen onShowToast={showToast} />
-          )}
+            {activeScreen === 'dashboard' && currentRole === 'Logistics Hub' && (
+              <LogisticsDashboard onNavigate={setActiveScreen} onShowToast={showToast} />
+            )}
 
-          {activeScreen === 'buyer-matching-offers' && (
-            <BuyerMatchingScreen onShowToast={showToast} />
-          )}
+            {activeScreen === 'dashboard' && currentRole === 'Admin' && (
+              <AdminDashboard onNavigate={setActiveScreen} onShowToast={showToast} />
+            )}
 
-          {activeScreen === 'net-realization-engine' && (
-            <NetRealizationScreen onShowToast={showToast} />
-          )}
+            {activeScreen === 'market' && <MarketScreen onNavigate={setActiveScreen} onShowToast={showToast} />}
 
-          {activeScreen === 'logistics-route-optimizer' && (
-            <LogisticsScreen onShowToast={showToast} />
-          )}
+            {activeScreen === 'demand-intelligence' && (
+              <DemandIntelligenceScreen onNavigate={setActiveScreen} onShowToast={showToast} />
+            )}
 
-          {activeScreen === 'value-chain-what-if-simulator' && (
-            <WhatIfSimulatorScreen onShowToast={showToast} />
-          )}
+            {activeScreen === 'ai-recommendations' && (
+              <AIRecommendationsScreen onNavigate={setActiveScreen} onShowToast={showToast} />
+            )}
 
-          {activeScreen === 'produce-lots' && (
-            <ProduceLotsScreen
-              lots={lots}
-              onOpenCreateLotModal={() => setIsCreateLotModalOpen(true)}
-              onShowToast={showToast}
-            />
-          )}
+            {activeScreen === 'supply-pooling' && <SupplyPoolingScreen onShowToast={showToast} />}
 
-          {activeScreen === 'ask-kisanflow' && <AskKisanFlowScreen />}
+            {activeScreen === 'buyer-matching-offers' && <BuyerMatchingScreen onShowToast={showToast} />}
+
+            {activeScreen === 'buyers' && <BuyersScreen onNavigate={setActiveScreen} onShowToast={showToast} />}
+
+            {activeScreen === 'net-realization-engine' && <NetRealizationScreen onShowToast={showToast} />}
+
+            {activeScreen === 'logistics-route-optimizer' && <LogisticsScreen onShowToast={showToast} />}
+
+            {activeScreen === 'value-chain-what-if-simulator' && <WhatIfSimulatorScreen onShowToast={showToast} />}
+
+            {activeScreen === 'produce-lots' && (
+              <ProduceLotsScreen
+                lots={lots}
+                onOpenCreateLotModal={() => setIsCreateLotModalOpen(true)}
+                onShowToast={showToast}
+              />
+            )}
+
+            {activeScreen === 'analytics' && <AnalyticsScreen onShowToast={showToast} />}
+
+            {activeScreen === 'ask-kisanflow' && <AskKisanFlowScreen />}
+          </div>
         </main>
-
-        {/* Fixed Bottom Footer */}
-        <Footer />
       </div>
 
       {/* Floating Toast Notification */}
-      <Toast
-        message={toastMessage}
-        onClose={() => setToastMessage(null)}
-      />
+      <Toast message={toastMessage} onClose={() => setToastMessage(null)} />
 
       {/* Notifications Drawer */}
       <NotificationsDrawer
