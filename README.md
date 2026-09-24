@@ -454,13 +454,3 @@ Add your selected open-source license here, for example:
 MIT License
 ```
 
-## 👨‍💻 Team
-
-**KisanFlow AI Team**
-
--   Team Lead --- \[Name\]
--   AI/ML --- \[Name\]
--   Backend --- \[Name\]
--   Frontend --- \[Name\]
--   Data/GIS --- \[Name\]
--   UI/UX --- \[Name\]
